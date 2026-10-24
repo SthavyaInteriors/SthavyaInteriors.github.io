@@ -14,3 +14,4 @@ Open `index.html` in any browser or host via **GitHub Pages**.
 - **Email**: [Sumansumanth1011@gmail.com](mailto:Sumansumanth1011@gmail.com)
 - **Phone**: +91 63636 51752
 - **Location**: Bengaluru, India
+- **Working Hours**: Monday – Saturday · 10 AM – 6 PM
