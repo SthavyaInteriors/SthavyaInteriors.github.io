@@ -89,6 +89,20 @@
     .project-arrow { font-size: 22px; transition: transform 0.25s ease, color 0.25s ease; }
     .project-card:hover .project-arrow { transform: translate(3px, -3px); color: var(--olive); }
 
+    /* Multi-image project slider */
+    .project-image.has-slides .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.5s ease, transform 0.6s ease; }
+    .project-image.has-slides .slide.active { opacity: 1; z-index: 1; }
+    .slide-btn { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 38px; height: 38px; border: none; border-radius: 50%; background: rgba(255, 254, 250, 0.88); color: var(--dark); font-size: 14px; cursor: pointer; opacity: 0; transition: opacity 0.25s ease, background 0.25s ease; }
+    .slide-btn.prev { left: 12px; }
+    .slide-btn.next { right: 12px; }
+    .slide-btn:hover { background: var(--white); }
+    .project-card:hover .slide-btn, .slide-btn:focus-visible { opacity: 1; }
+    .slide-dots { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 7px; }
+    .slide-dots span { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 254, 250, 0.55); transition: background 0.25s ease, transform 0.25s ease; }
+    .slide-dots span.active { background: var(--white); transform: scale(1.25); }
+    .project-number { z-index: 3; }
+    @media (hover: none) { .slide-btn { opacity: 1; } }
+
     /* Lightbox Preview */
     .lightbox-modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 24px; }
     .lightbox-modal.active { opacity: 1; pointer-events: auto; }
@@ -268,8 +282,13 @@
         </div>
         <div class="project-grid">
           <article class="project-card reveal" data-category="bedroom">
-            <div class="project-image">
-              <img src="bedroom-1.jpg" alt="Master Bedroom with Crimson Velvet Paneling and Brass Details" loading="lazy" />
+            <div class="project-image has-slides">
+              <img class="slide active" src="bedroom-1.jpg" alt="Master Bedroom with Crimson Velvet Paneling and Brass Details" loading="lazy" />
+              <img class="slide" src="bedroom-1b.jpg" alt="Walk-in Wardrobe with Backlit Glass Display and Marble Island" loading="lazy" />
+              <img class="slide" src="bedroom-1c.jpg" alt="Dressing Area with Walnut Fluted Wardrobe and Glass-top Island" loading="lazy" />
+              <button class="slide-btn prev" type="button" aria-label="Previous image">&#10094;</button>
+              <button class="slide-btn next" type="button" aria-label="Next image">&#10095;</button>
+              <div class="slide-dots" aria-hidden="true"><span class="active"></span><span></span><span></span></div>
               <span class="project-number">PROJECT 01</span>
             </div>
             <div class="project-info">
@@ -517,6 +536,20 @@
       });
     });
 
+    // Multi-image project slider
+    document.querySelectorAll(".project-image.has-slides").forEach(box => {
+      const slides = box.querySelectorAll(".slide");
+      const dots = box.querySelectorAll(".slide-dots span");
+      let index = 0;
+      const show = i => {
+        index = (i + slides.length) % slides.length;
+        slides.forEach((s, n) => s.classList.toggle("active", n === index));
+        dots.forEach((d, n) => d.classList.toggle("active", n === index));
+      };
+      box.querySelector(".prev").addEventListener("click", e => { e.stopPropagation(); show(index - 1); });
+      box.querySelector(".next").addEventListener("click", e => { e.stopPropagation(); show(index + 1); });
+    });
+
     // Lightbox Modal Functionality
     const lightbox = document.getElementById("imageLightbox");
     const lightboxImg = document.getElementById("lightboxImg");
@@ -527,7 +560,7 @@
 
     projectCards.forEach(card => {
       card.addEventListener("click", () => {
-        const img = card.querySelector(".project-image img");
+        const img = card.querySelector(".project-image img.active") || card.querySelector(".project-image img");
         const title = card.querySelector(".project-info h3")?.textContent || "";
         const sub = card.querySelector(".project-info p")?.textContent || "";
         if (img && lightbox && lightboxImg) {
